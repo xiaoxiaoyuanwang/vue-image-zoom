@@ -1,18 +1,18 @@
 <template>
   <div class="home">
-    <div class="img-wrapper" v-for="(item, index) in imgArr.list" :key="index">
-      <img class="img-item" :src="item.fileUrl" @click="handleClick(index)" />
+    <div v-for="(item, index) in imgArr.list" :key="index" class="img-wrapper">
+      <img class="img-item" :src="item.fileUrl" @click="handleClick(index)">
     </div>
-    <ImageZoom :imgLists="imgArr" msg="Welcome to Your Vue.js App" />
+    <ImageZoom :img-lists="imgArr" msg="Welcome to Your Vue.js App" />
   </div>
 </template>
 
 <script>
 // @ is an alias to /src
-import ImageZoom from "@/components/ImageZoom.vue";
+import ImageZoom from '@/components/ImageZoom.vue'
 
 export default {
-  name: "home",
+  name: 'Home',
   components: {
     ImageZoom
   },
@@ -22,27 +22,27 @@ export default {
         showDialog: false,
         currentIn: 0,
         list: [
-          { fileUrl: require("@/assets/1.jpg") },
-          { fileUrl: require("@/assets/2.jpg") },
-          { fileUrl: require("@/assets/3.jpg") },
-          { fileUrl: require("@/assets/4.jpg") },
-          { fileUrl: require("@/assets/5.jpg") },
-          { fileUrl: require("@/assets/6.jpg") },
-          { fileUrl: require("@/assets/7.jpg") },
-          { fileUrl: require("@/assets/8.gif") },
-          { fileUrl: require("@/assets/9.gif") },
-          { fileUrl: require("@/assets/10.gif") }
+          { fileUrl: require('@/assets/1.jpg') },
+          { fileUrl: require('@/assets/2.jpg') },
+          { fileUrl: require('@/assets/3.jpg') },
+          { fileUrl: require('@/assets/4.jpg') },
+          { fileUrl: require('@/assets/5.jpg') },
+          { fileUrl: require('@/assets/6.jpg') },
+          { fileUrl: require('@/assets/7.jpg') },
+          { fileUrl: require('@/assets/8.gif') },
+          { fileUrl: require('@/assets/9.gif') },
+          { fileUrl: require('@/assets/10.gif') }
         ]
       }
-    };
+    }
   },
   methods: {
     handleClick(index) {
-      this.imgArr.currentIn = index;
-      this.imgArr.showDialog = true;
+      this.imgArr.currentIn = index
+      this.imgArr.showDialog = true
     }
   }
-};
+}
 </script>
 <style lang="less" scoped>
 .img-wrapper {
