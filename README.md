@@ -1,4 +1,4 @@
-# image-zoom
+# vue-image-zoom
 
 ## Project description
 ```
