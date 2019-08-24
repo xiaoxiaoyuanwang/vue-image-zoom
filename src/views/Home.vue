@@ -45,11 +45,13 @@ export default {
 }
 </script>
 <style lang="less" scoped>
-.img-wrapper {
-  display: inline-block;
-  padding: 15px;
-  .img-item {
-    height: 150px;
+.home {
+  .img-wrapper {
+    display: inline-block;
+    padding: 15px;
+    .img-item {
+      height: 150px;
+    }
   }
 }
 </style>

@@ -48,11 +48,11 @@ module.exports = {
     // 单页插件相关配置 https://github.com/vuejs/vue-cli/tree/dev/packages/%40vue/cli-plugin-pwa
   },
   devServer: {
-    open: false,
+    open: true,
     host: '0.0.0.0',
     port: 8080,
     https: false,
-    hotOnly: false,
+    hotOnly: true,
     proxy: null
     // proxy: 'http://localhost:8080',
     // proxy: {
