@@ -2,7 +2,7 @@
 
 ## Project description
 ```
-基于vue2.6.10 + cli3 + element-ui2.11.1 的图片缩放、选择、移动
+基于vue2.6.10 + cli3  的图片缩放、选择、移动
 ```
 
 ## Project setup
