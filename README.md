@@ -1,8 +1,8 @@
-# image-zoom
+# vue-image-zoom
 
 ## Project description
 ```
-基于vue2.6.10 + cli3 + element-ui2.11.1 的图片缩放、选择、移动
+基于vue2.6.10 + cli3  的图片缩放、选择、移动，支持鼠标滚轮事件和点击事件
 ```
 
 ## Project setup
