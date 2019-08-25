@@ -4,6 +4,9 @@
 ```
 基于vue2.6.10 + cli3 + element-ui2.11.1 的图片缩放、选择、移动
 ```
+<p align="center">
+  <img width="900" src="./src/assets/dome.gif">
+</p>
 
 ## Project setup
 ```
