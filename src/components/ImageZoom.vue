@@ -139,7 +139,8 @@ export default {
         const h = document.getElementsByClassName('img')[idx].offsetHeight
         this.Height = h
       }
-      if (event.deltaY < 0 || event.detail < 0) {
+      console.log(event)
+      if (event.wheelDelta < 0 || event.detail < 0) {
         this.$set(this.imgLists.list[idx], 'wheelUp', true)
         this.$set(this.imgLists.list[idx], 'wheelDes', false)
         this.Height -= this.zoomSize
