@@ -2,7 +2,7 @@
 
 ## Project description
 ```
-基于vue2.6.10 + cli3  的图片缩放、选择、移动，支持鼠标滚轮事件和点击事件，适用于主流浏览器
+基于vue2.6.10 + cli3 + css3 transform 的图片缩放、旋转、移动，支持鼠标滚轮事件和点击事件，适用于主流浏览器
 ```
 <p align="center">
   <img width="900" src="./src/assets/dome.gif">

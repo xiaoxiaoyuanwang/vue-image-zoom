@@ -5,7 +5,6 @@
       center
       :visible.sync="imgLists.showDialog"
       :close-on-click-modal="false"
-      :before-close="dialogClose"
       :fullscreen="isFullScreen"
       width="60%"
     >
@@ -41,21 +40,13 @@
             name="index"
           >
             <img
-              class="img"
               :class="{
                 imgItem: !item.wheel,
                 imgItemWheelUp: item.wheelUp,
                 imgItemWheelDes: item.wheelDes,
                 imgItemMove: item.move
               }"
-              :style="
-                `
-              margin-left:${item.moveLeft}px;
-              margin-top:${item.moveTop}px;
-              height:${item.height}px;
-              transform:rotate(${item.rotate}deg);
-              `
-              "
+              :style="`${transform}:${item.transfrom}`"
               :src="`${item.fileUrl}`"
               @DOMMouseScroll.prevent="mousewheel(index)"
               @mousewheel.prevent="mousewheel(index)"
@@ -101,6 +92,8 @@
 </template>
 
 <script type="text/javascript">
+import { prefixStyle } from '@/common/js/dom' // 获取浏览器支持的transform
+const defaultHeight = '300px' // carousel默认高度
 export default {
   name: 'ImageZoom',
   props: {
@@ -111,88 +104,98 @@ export default {
   },
   data() {
     return {
-      currentIndex: 0,
+      transform: prefixStyle('transform'), // 获取浏览器支持的transform
+      currentIndex: 0, // 当前下标加一
       isFullScreen: false, // 是否全屏
-      fullHeight: '300px', // carousel高度
-      marginLeft: 0, // 中间变量，暂存元素移动时的margin
-      marginTop: 0, // 中间变量，暂存元素移动时的margin
-      imgMarginTop: 0, // 中间变量，暂存元素点击时的margin
-      imgMarginLeft: 0, // 中间变量，暂存元素点击时的margin
-      Height: 0, // 中间变量
-      Rotate: 0, // 中间变量
-      zoomSize: 50 // 缩放大小尺寸
+      fullHeight: defaultHeight, // carousel高度
+      imgTranslateTop: 0, // 中间变量，暂存元素点击时的translate
+      imgTranslateLeft: 0, // 中间变量，暂存元素点击时的translate
+      zoomSize: 0.1, // 缩放大小阶梯
+      scaleDt: 1 // 缩放初始值1
     }
   },
   watch: {
+    // 当前图片下标变化时，对图片初始化
     'imgLists.currentIn': function(newInd) {
       this.$nextTick(function() {
         this.$refs.carousel.setActiveItem(newInd)
+        if (!this.imgLists.list[newInd].hasInit) {
+          // 初始化对象
+          this.initFun(this.imgLists.list[newInd])
+        }
       })
     }
   },
-  mounted() {},
   methods: {
     // 滚轮缩放
     mousewheel(idx, isDec) {
-      this.$set(this.imgLists.list[idx], 'wheel', true)
-      if (this.imgLists.list[idx].height === undefined) {
-        const h = document.getElementsByClassName('img')[idx].offsetHeight
-        this.Height = h
+      const listItem = this.imgLists.list[idx]
+      listItem.wheel = true
+      if (listItem.scale === undefined) {
+        this.scaleDt = 1
+      } else {
+        this.scaleDt = listItem.scale
       }
-      if (event.wheelDelta < 0 || event.detail < 0) {
-        this.$set(this.imgLists.list[idx], 'wheelUp', true)
-        this.$set(this.imgLists.list[idx], 'wheelDes', false)
-        this.Height -= this.zoomSize
+      if (event.wheelDelta > 0 || event.detail < 0) {
+        listItem.wheelUp = true
+        listItem.wheelDes = false
+        this.scaleDt -= this.zoomSize
       } else {
         if (isDec) {
-          this.$set(this.imgLists.list[idx], 'wheelUp', true)
-          this.$set(this.imgLists.list[idx], 'wheelDes', false)
-          this.Height -= this.zoomSize
+          listItem.wheelUp = true
+          listItem.wheelDes = false
+          this.scaleDt -= this.zoomSize
         } else {
-          this.$set(this.imgLists.list[idx], 'wheelUp', false)
-          this.$set(this.imgLists.list[idx], 'wheelDes', true)
-          this.Height += this.zoomSize
+          listItem.wheelUp = false
+          listItem.wheelDes = true
+          this.scaleDt += this.zoomSize
         }
       }
-      this.$set(this.imgLists.list[idx], 'height', this.Height)
-      if (this.imgLists.list[idx].height < 50) {
-        this.Height = 50
-        this.$set(this.imgLists.list[idx], 'height', 50)
+      this.scaleDt.toFixed(1)
+      listItem.scale = this.scaleDt
+      this.setTransform()
+      if (this.imgLists.list[idx].scale < 0.2) {
+        this.scaleDt = 0.2
+        this.scaleDt.toFixed(1)
+        listItem.scale = this.scaleDt
+        this.setTransform()
       }
     },
     // 鼠标按下
     mousedown(idx) {
       // 清除滚轮的样式
-      this.$set(this.imgLists.list[idx], 'wheelUp', false)
-      this.$set(this.imgLists.list[idx], 'wheelDes', false)
-      this.imgMarginTop = this.imgLists.list[idx].moveTop
-        ? this.imgLists.list[idx].moveTop
+      const listItem = this.imgLists.list[idx]
+      listItem.wheelUp = false
+      listItem.wheelDes = false
+      this.imgTranslateTop = listItem.translateY
+        ? listItem.translateY
         : 0
-      this.imgMarginLeft = this.imgLists.list[idx].moveLeft
-        ? this.imgLists.list[idx].moveLeft
+      this.imgTranslateLeft = listItem.translateX
+        ? listItem.translateX
         : 0
-      this.$set(this.imgLists.list[idx], 'downPositionTop', event.screenY)
-      this.$set(this.imgLists.list[idx], 'downPositionLeft', event.screenX)
-      this.$set(this.imgLists.list[idx], 'move', true)
+      listItem.downPositionTop = event.screenY
+      listItem.downPositionLeft = event.screenX
+      listItem.move = true
     },
     // 鼠标移动
     mousemove(idx) {
-      if (this.imgLists.list[idx].move) {
-        this.marginTop =
+      const listItem = this.imgLists.list[idx]
+      if (listItem.move) {
+        listItem.translateY =
           event.screenY -
-          this.imgLists.list[idx].downPositionTop +
-          this.imgMarginTop
-        this.marginLeft =
+          listItem.downPositionTop +
+          this.imgTranslateTop
+        listItem.translateX =
           event.screenX -
-          this.imgLists.list[idx].downPositionLeft +
-          this.imgMarginLeft
-        this.$set(this.imgLists.list[idx], 'moveTop', this.marginTop)
-        this.$set(this.imgLists.list[idx], 'moveLeft', this.marginLeft)
+          listItem.downPositionLeft +
+          this.imgTranslateLeft
+        this.setTransform()
       }
     },
     // 鼠标抬起
     mouseup(idx) {
-      this.$set(this.imgLists.list[idx], 'move', false)
+      const listItem = this.imgLists.list[idx]
+      listItem.move = false
     },
     // 点击放大or点击缩小
     clickInOrOut(bool) {
@@ -202,11 +205,13 @@ export default {
     // 左旋转or右旋转
     rotateLeftOrRight(dir) {
       const idx = this.$refs.carousel.activeIndex
+      const listItem = this.imgLists.list[idx]
       const direction = dir === 'left' ? -90 : 90
-      this.Rotate = this.imgLists.list[idx].rotate
-        ? this.imgLists.list[idx].rotate + direction
+      const Rotate = listItem.rotate
+        ? listItem.rotate + direction
         : direction
-      this.$set(this.imgLists.list[idx], 'rotate', this.Rotate)
+      listItem.rotate = Rotate
+      this.setTransform()
     },
     // 全屏
     clickFullScreen() {
@@ -214,9 +219,10 @@ export default {
       if (this.isFullScreen) {
         this.fullHeight = `${window.innerHeight - 180}px`
       } else {
-        this.fullHeight = `300px`
+        this.fullHeight = defaultHeight
       }
     },
+    // carouse左右按钮点击事件
     carouselChange(index) {
       if (this.imgLists.list.length > 0) {
         this.currentIndex = index + 1
@@ -227,18 +233,24 @@ export default {
         this.currentIndex = 0
       }
     },
-    // 弹框关闭前回复状态
-    dialogClose(done) {
-      this.imgLists.list.map(item => {
-        this.$set(item, 'move', false)
-        this.$set(item, 'wheel', false)
-        this.$set(item, 'wheelDes', false)
-        this.$set(item, 'wheelUp', false)
-        this.$set(item, 'rotate', 0)
-        this.$set(item, 'moveLeft', 0)
-        this.$set(item, 'moveTop', 0)
-      })
-      done()
+    // 设置css3 transfrom
+    setTransform() {
+      const idx = this.$refs.carousel.activeIndex
+      const listItem = this.imgLists.list[idx]
+      listItem.transfrom = `translate(${listItem.translateX}px, ${listItem.translateY}px) scale(${listItem.scale}, ${listItem.scale}) rotate(${listItem.rotate}deg)`
+    },
+    // 初始化对象
+    initFun(item) {
+      this.$set(item, 'hasInit', true)
+      this.$set(item, 'move', false)
+      this.$set(item, 'wheel', false)
+      this.$set(item, 'wheelDes', false)
+      this.$set(item, 'wheelUp', false)
+      this.$set(item, 'scale', 1) // 缩放
+      this.$set(item, 'rotate', 0) // 旋转
+      this.$set(item, 'translateX', 0) // X轴移动距离
+      this.$set(item, 'translateY', 0) // Y轴移动距离
+      this.$set(item, 'transfrom', null) // css组合样式
     }
   }
 }
@@ -262,8 +274,8 @@ export default {
       align-items: center;
     }
   }
-  .imgItem {
-    transition: transform 0.3s, height 0.3s linear;
+  .img {
+    transition: all 0.3s linear;
   }
   .imgItem {
     height: auto !important;
