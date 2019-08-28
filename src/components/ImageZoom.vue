@@ -93,7 +93,7 @@
 
 <script type="text/javascript">
 import { prefixStyle } from '@/common/js/dom' // 获取浏览器支持的transform
-const defaultHeight = '300px' // carousel默认高度
+const DEFAULTHT = '300px' // carousel默认高度
 export default {
   name: 'ImageZoom',
   props: {
@@ -107,7 +107,7 @@ export default {
       transform: prefixStyle('transform'), // 获取浏览器支持的transform
       currentIndex: 0, // 当前下标加一
       isFullScreen: false, // 是否全屏
-      fullHeight: defaultHeight, // carousel高度
+      fullHeight: DEFAULTHT, // carousel高度
       imgTranslateTop: 0, // 中间变量，暂存元素点击时的translate
       imgTranslateLeft: 0, // 中间变量，暂存元素点击时的translate
       zoomSize: 0.1, // 缩放大小阶梯
@@ -219,7 +219,7 @@ export default {
       if (this.isFullScreen) {
         this.fullHeight = `${window.innerHeight - 180}px`
       } else {
-        this.fullHeight = defaultHeight
+        this.fullHeight = DEFAULTHT
       }
     },
     // carouse左右按钮点击事件
